@@ -10,10 +10,11 @@ import (
 type Store struct {
 	db *sql.DB
 	*Queries
+	mu sync.Mutex
 }
 
 func NewStore(db *sql.DB) *Store {
-	return &Store{db, New(db)}
+	return &Store{db, New(db), sync.Mutex{}}
 }
 
 func (s *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
@@ -48,13 +49,11 @@ type (
 	}
 )
 
-var mu sync.Mutex
-
 func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	mu.Lock()
-	defer mu.Unlock()
 	err := s.execTx(ctx, func(q *Queries) error {
 		var err error
 		// create transfer for history tracing
