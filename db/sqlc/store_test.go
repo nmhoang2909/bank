@@ -64,3 +64,41 @@ func TestTransferTx(t *testing.T) {
 	acc2Updated, _ := testQueries.GetAccountById(context.Background(), accId2)
 	assert.Equal(t, acc2.Balance+10*int32(n), acc2Updated.Balance)
 }
+
+func TestTransferTxDeadlock(t *testing.T) {
+	store := NewStore(testDB)
+	accId1 := createRandomAccount()
+	accId2 := createRandomAccount()
+	acc1, _ := testQueries.GetAccountById(context.Background(), accId1)
+	acc2, _ := testQueries.GetAccountById(context.Background(), accId2)
+
+	errs := make(chan error)
+	n := 10
+	for i := 0; i < n; i++ {
+		fromAccId := accId1
+		toAccId := accId2
+
+		if i%2 == 1 {
+			fromAccId = accId2
+			toAccId = accId1
+		}
+
+		go func() {
+			_, err := store.TransferTx(context.Background(), TransferTxParams{
+				FromAccountID: fromAccId,
+				ToAccountID:   toAccId,
+				Amount:        10,
+			})
+			errs <- err
+		}()
+	}
+
+	for i := 0; i < n; i++ {
+		err := <-errs
+		assert.NoError(t, err)
+	}
+	acc1Updated, _ := testQueries.GetAccountById(context.Background(), accId1)
+	assert.Equal(t, acc1.Balance, acc1Updated.Balance)
+	acc2Updated, _ := testQueries.GetAccountById(context.Background(), accId2)
+	assert.Equal(t, acc2.Balance, acc2Updated.Balance)
+}
