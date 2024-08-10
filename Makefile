@@ -8,4 +8,7 @@ migrateup:
 	migrate -path db/migration -database "mysql://root:secret@tcp/bank" -verbose up
 migratedown:
 	migrate -path db/migration -database "mysql://root:secret@tcp/bank" -verbose down
-.PHONY: mysqlup createdb dropdb migrateup migratedown
+test:
+	go test -v -cover ./...
+
+.PHONY: mysqlup createdb dropdb migrateup migratedown test
