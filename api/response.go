@@ -8,3 +8,9 @@ func errorResponse(err error) gin.H {
 		"error": err.Error(),
 	}
 }
+
+func response(data any) gin.H {
+	return gin.H{
+		"data": data,
+	}
+}

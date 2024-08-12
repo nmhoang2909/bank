@@ -56,5 +56,29 @@ func (s *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, account)
+	ctx.JSON(http.StatusOK, response(account))
+}
+
+type getAccountsQuery struct {
+	PageId   int32 `form:"page_id" binding:"min=1"`
+	PageSize int32 `form:"page_size" binding:"min=5,max=10"`
+}
+
+func (s *Server) getAccounts(ctx *gin.Context) {
+	var query getAccountsQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	accounts, err := s.store.GetAccounts(ctx, db.GetAccountsParams{
+		Limit:  query.PageSize,
+		Offset: (query.PageId - 1) * query.PageSize,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response(accounts))
 }
