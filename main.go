@@ -3,15 +3,16 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/nmhoang2909/bank/api"
 	db "github.com/nmhoang2909/bank/db/sqlc"
 )
 
 const (
-	driverName = "mysql"
-	dataSource = "root:secret@tcp/bank?parseTime=true"
+	driverName    = "mysql"
+	dataSource    = "root:secret@tcp/bank?parseTime=true"
+	serverAddress = "localhost:8080"
 )
 
 func main() {
@@ -25,7 +26,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db.NewStore(conn)
-
-	os.Exit(m.Run())
+	store := db.NewStore(conn)
+	server := api.NewServer(store)
+	if err := server.Start(serverAddress); err != nil {
+		log.Fatal(err)
+	}
 }

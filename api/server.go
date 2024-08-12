@@ -15,7 +15,12 @@ func NewServer(store *db.Store) *Server {
 		store: store,
 	}
 	router := gin.Default()
-	router.POST("/accounts", sv.createAccount())
+	router.POST("/accounts", sv.createAccount)
+	router.GET("/accounts/:id", sv.getAccount)
 	sv.route = router
 	return sv
+}
+
+func (s *Server) Start(address string) error {
+	return s.route.Run(address)
 }
