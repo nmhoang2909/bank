@@ -9,7 +9,7 @@ INSERT INTO accounts (
 SELECT * FROM accounts WHERE id = ? LIMIT 1;
 
 -- name: GetAccounts :many
-SELECT * FROM accounts LIMIT ? OFFSET ?;
+SELECT * FROM accounts ORDER BY id DESC LIMIT ? OFFSET ?;
 
 -- name: DeleteAccountById :exec
 DELETE FROM accounts WHERE id = ?;

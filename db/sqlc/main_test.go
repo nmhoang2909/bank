@@ -7,11 +7,7 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
-)
-
-const (
-	driverName = "mysql"
-	dataSource = "root:secret@tcp/bank?parseTime=true"
+	"github.com/nmhoang2909/bank/util"
 )
 
 var (
@@ -21,7 +17,11 @@ var (
 
 func TestMain(m *testing.M) {
 	var err error
-	testDB, err = sql.Open(driverName, dataSource)
+	config, err := util.LoadConfig("../../.")
+	if err != nil {
+		log.Fatal(err)
+	}
+	testDB, err = sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal(err)
 	}

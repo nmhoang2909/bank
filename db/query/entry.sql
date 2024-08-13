@@ -4,3 +4,6 @@ INSERT INTO entries
 
 -- name: GetEntryById :one
 select * from entries where id = ?;
+
+-- name: DeleteEntryByAccountId :exec
+DELETE FROM entries WHERE account_id = ?;

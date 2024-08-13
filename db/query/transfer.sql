@@ -4,3 +4,10 @@ insert into transfers
 
 -- name: GetTransferById :one
 select * from transfers where id = ?;
+
+-- name: DeleteTransferByFromAccontId :exec
+DELETE FROM transfers WHERE from_account_id = ?;
+
+-- name: DeleteTransferByToAccontId :exec
+DELETE FROM transfers WHERE to_account_id = ?;
+

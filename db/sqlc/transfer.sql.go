@@ -28,6 +28,24 @@ func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) 
 	return result.LastInsertId()
 }
 
+const deleteTransferByFromAccontId = `-- name: DeleteTransferByFromAccontId :exec
+DELETE FROM transfers WHERE from_account_id = ?
+`
+
+func (q *Queries) DeleteTransferByFromAccontId(ctx context.Context, fromAccountID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteTransferByFromAccontId, fromAccountID)
+	return err
+}
+
+const deleteTransferByToAccontId = `-- name: DeleteTransferByToAccontId :exec
+DELETE FROM transfers WHERE to_account_id = ?
+`
+
+func (q *Queries) DeleteTransferByToAccontId(ctx context.Context, toAccountID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteTransferByToAccontId, toAccountID)
+	return err
+}
+
 const getTransferById = `-- name: GetTransferById :one
 select id, from_account_id, to_account_id, amount, created_at from transfers where id = ?
 `

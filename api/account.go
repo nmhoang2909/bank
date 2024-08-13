@@ -82,3 +82,45 @@ func (s *Server) getAccounts(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response(accounts))
 }
+
+type updateBalanceAccountReq struct {
+	Amount int32 `json:"amount" binding:"required"`
+	ID     int64 `json:"id" binding:"required,min=0"`
+}
+
+func (s *Server) updateBalanceAccount(ctx *gin.Context) {
+	var req updateBalanceAccountReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := s.store.UpdateAccountBalance(ctx, db.UpdateAccountBalanceParams{
+		Amount: req.Amount,
+		ID:     req.ID,
+	}); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
+type deleteAccountReq struct {
+	Id int64 `uri:"id" binding:"min=1"`
+}
+
+func (s *Server) deleteAccount(ctx *gin.Context) {
+	var req deleteAccountReq
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := s.store.DeleteAccountTx(ctx, req.Id); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}

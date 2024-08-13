@@ -58,7 +58,7 @@ func (q *Queries) GetAccountById(ctx context.Context, id int64) (Account, error)
 }
 
 const getAccounts = `-- name: GetAccounts :many
-SELECT id, owner, balance, currency, created_at FROM accounts LIMIT ? OFFSET ?
+SELECT id, owner, balance, currency, created_at FROM accounts ORDER BY id DESC LIMIT ? OFFSET ?
 `
 
 type GetAccountsParams struct {

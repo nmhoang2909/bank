@@ -27,6 +27,15 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (int64
 	return result.LastInsertId()
 }
 
+const deleteEntryByAccountId = `-- name: DeleteEntryByAccountId :exec
+DELETE FROM entries WHERE account_id = ?
+`
+
+func (q *Queries) DeleteEntryByAccountId(ctx context.Context, accountID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteEntryByAccountId, accountID)
+	return err
+}
+
 const getEntryById = `-- name: GetEntryById :one
 select id, account_id, amount, created_at from entries where id = ?
 `

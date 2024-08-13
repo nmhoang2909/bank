@@ -96,18 +96,6 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 			return err
 		}
 
-		// update balance accounts
-		// fromAccount, err := s.Queries.GetAccountByIdForUpdate(ctx, arg.FromAccountID)
-		// if err != nil {
-		// 	return err
-		// }
-		// fromAccToBeUpdate := UpdateAccountByIdParams{
-		// 	Balance: fromAccount.Balance - int32(arg.Amount),
-		// 	ID:      arg.FromAccountID,
-		// }
-		// if err = s.Queries.UpdateAccountById(ctx, fromAccToBeUpdate); err != nil {
-		// 	return err
-		// }
 		if err = s.Queries.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
 			Amount: -int32(arg.Amount),
 			ID:     arg.FromAccountID,
@@ -120,18 +108,6 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 			return err
 		}
 		result.FromAccount = fromAccount
-
-		// toAccount, err := s.Queries.GetAccountByIdForUpdate(ctx, arg.ToAccountID)
-		// if err != nil {
-		// 	return err
-		// }
-		// toAccToBeUpdate := UpdateAccountByIdParams{
-		// 	Balance: toAccount.Balance + int32(arg.Amount),
-		// 	ID:      arg.ToAccountID,
-		// }
-		// if err = s.Queries.UpdateAccountById(ctx, toAccToBeUpdate); err != nil {
-		// 	return err
-		// }
 
 		if err = s.Queries.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
 			Amount: int32(arg.Amount),
@@ -149,4 +125,31 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 	})
 
 	return result, err
+}
+
+func (s *Store) DeleteAccountTx(ctx context.Context, accountId int64) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	err := s.execTx(ctx, func(q *Queries) error {
+		var err error
+		err = q.DeleteTransferByFromAccontId(ctx, accountId)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteTransferByToAccontId(ctx, accountId)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteEntryByAccountId(ctx, accountId)
+		if err != nil {
+			return err
+		}
+		err = q.DeleteAccountById(ctx, accountId)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
 }
