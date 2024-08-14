@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,27 +40,73 @@ func checkBodyMatch(t *testing.T, body *bytes.Buffer, expect db.Account) {
 }
 
 func TestGetAccountAPI(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	store := mockdb.NewMockIStore(ctrl)
-	server := NewServer(store)
-
 	account := randomAccount()
 
-	// stub
-	store.EXPECT().
-		GetAccountById(gomock.Any(), account.ID).
-		Times(1).
-		Return(account, nil)
+	testcases := []struct {
+		name          string
+		accountId     int64
+		buildStubs    func(store *mockdb.MockIStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:      "OK",
+			accountId: account.ID,
+			buildStubs: func(store *mockdb.MockIStore) {
+				store.EXPECT().
+					GetAccountById(gomock.Any(), account.ID).
+					Times(1).
+					Return(account, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusOK, recorder.Code)
+				checkBodyMatch(t, recorder.Body, account)
+			},
+		},
+		{
+			name:      "NOT FOUND",
+			accountId: account.ID,
+			buildStubs: func(store *mockdb.MockIStore) {
+				store.EXPECT().
+					GetAccountById(gomock.Any(), account.ID).
+					Times(1).
+					Return(db.Account{}, sql.ErrNoRows)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusNotFound, recorder.Code)
+				checkBodyMatch(t, recorder.Body, db.Account{})
+			},
+		},
+		{
+			name:      "INTERNAL ERROR",
+			accountId: account.ID,
+			buildStubs: func(store *mockdb.MockIStore) {
+				store.EXPECT().
+					GetAccountById(gomock.Any(), account.ID).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+				checkBodyMatch(t, recorder.Body, db.Account{})
+			},
+		},
+	}
 
-	// server exec
-	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/accounts/%d", account.ID), nil)
-	assert.NoError(t, err)
-	recorder := httptest.NewRecorder()
-	server.route.ServeHTTP(recorder, request)
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	// assert
-	assert.Equal(t, http.StatusOK, recorder.Code)
-	checkBodyMatch(t, recorder.Body, account)
+			store := mockdb.NewMockIStore(ctrl)
+			server := NewServer(store)
+			tc.buildStubs(store)
+
+			request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/accounts/%d", tc.accountId), nil)
+			assert.NoError(t, err)
+			recorder := httptest.NewRecorder()
+			server.route.ServeHTTP(recorder, request)
+
+			tc.checkResponse(t, recorder)
+		})
+	}
 }
