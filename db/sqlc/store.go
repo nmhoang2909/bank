@@ -7,13 +7,20 @@ import (
 	"sync"
 )
 
+//go:generate mockgen -package mockdb -destination ./../mock/store.go github.com/nmhoang2909/bank/db/sqlc IStore
+type IStore interface {
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+	DeleteAccountTx(ctx context.Context, accountId int64) error
+	Querier
+}
+
 type Store struct {
 	db *sql.DB
 	*Queries
 	mu sync.Mutex
 }
 
-func NewStore(db *sql.DB) *Store {
+func NewStore(db *sql.DB) IStore {
 	return &Store{db, New(db), sync.Mutex{}}
 }
 

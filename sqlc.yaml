@@ -10,6 +10,7 @@ sql:
         emit_json_tags: true
         emit_db_tags: true
         emit_empty_slices: true
+        emit_interface: true
         overrides:
           - db_type: timestamp
             go_type: time.Time
