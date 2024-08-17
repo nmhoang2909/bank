@@ -9,8 +9,8 @@ import (
 
 func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
-	accId1 := createRandomAccount()
-	accId2 := createRandomAccount()
+	accId1 := createRandomAccount(t)
+	accId2 := createRandomAccount(t)
 	acc1, _ := testQueries.GetAccountById(context.Background(), accId1)
 	acc2, _ := testQueries.GetAccountById(context.Background(), accId2)
 
@@ -67,8 +67,8 @@ func TestTransferTx(t *testing.T) {
 
 func TestTransferTxDeadlock(t *testing.T) {
 	store := NewStore(testDB)
-	accId1 := createRandomAccount()
-	accId2 := createRandomAccount()
+	accId1 := createRandomAccount(t)
+	accId2 := createRandomAccount(t)
 	acc1, _ := testQueries.GetAccountById(context.Background(), accId1)
 	acc2, _ := testQueries.GetAccountById(context.Background(), accId2)
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 	db "github.com/nmhoang2909/bank/db/sqlc"
 )
 
@@ -26,6 +27,13 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		Currency: createAccount.Currency,
 	})
 	if err != nil {
+		if sqlErr, ok := err.(*mysql.MySQLError); ok {
+			switch sqlErr.Number {
+			case 1452, 1062:
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+			}
+		}
+
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

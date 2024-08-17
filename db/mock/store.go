@@ -85,6 +85,21 @@ func (mr *MockIStoreMockRecorder) CreateTransfer(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTransfer", reflect.TypeOf((*MockIStore)(nil).CreateTransfer), arg0, arg1)
 }
 
+// CreateUser mocks base method.
+func (m *MockIStore) CreateUser(arg0 context.Context, arg1 db.CreateUserParams) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockIStoreMockRecorder) CreateUser(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIStore)(nil).CreateUser), arg0, arg1)
+}
+
 // DeleteAccountById mocks base method.
 func (m *MockIStore) DeleteAccountById(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -213,6 +228,21 @@ func (m *MockIStore) GetTransferById(arg0 context.Context, arg1 int64) (db.Trans
 func (mr *MockIStoreMockRecorder) GetTransferById(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransferById", reflect.TypeOf((*MockIStore)(nil).GetTransferById), arg0, arg1)
+}
+
+// GetUser mocks base method.
+func (m *MockIStore) GetUser(arg0 context.Context, arg1 string) (db.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUser", arg0, arg1)
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUser indicates an expected call of GetUser.
+func (mr *MockIStoreMockRecorder) GetUser(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockIStore)(nil).GetUser), arg0, arg1)
 }
 
 // TransferTx mocks base method.

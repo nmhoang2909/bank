@@ -9,8 +9,9 @@ import (
 )
 
 func TestCreateAccount(t *testing.T) {
+	username := createRandomUser(t)
 	arg := CreateAccountParams{
-		Owner:    "BM",
+		Owner:    username,
 		Balance:  200,
 		Currency: "USD",
 	}
@@ -19,9 +20,10 @@ func TestCreateAccount(t *testing.T) {
 	assert.NotEmpty(t, id)
 }
 
-func createRandomAccount() (accountId int64) {
+func createRandomAccount(t *testing.T) (accountId int64) {
+	username := createRandomUser(t)
 	arg := CreateAccountParams{
-		Owner:    util.RandomString(6),
+		Owner:    username,
 		Balance:  int32(util.RandomNumber(500, 10000)),
 		Currency: util.RandomCurrency(),
 	}
