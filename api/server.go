@@ -20,6 +20,8 @@ func NewServer(store db.IStore) *Server {
 	router.GET("/accounts", sv.getAccounts)
 	router.PUT("/accounts", sv.updateBalanceAccount)
 	router.DELETE("/accounts/:id", sv.deleteAccount)
+
+	router.POST("/users", sv.createUser)
 	sv.route = router
 	return sv
 }

@@ -31,6 +31,7 @@ func (s *Server) createAccount(ctx *gin.Context) {
 			switch sqlErr.Number {
 			case 1452, 1062:
 				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
 			}
 		}
 
