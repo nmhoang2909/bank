@@ -3,6 +3,7 @@ package util
 import (
 	rc "crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"math/rand"
 )
 
@@ -19,4 +20,8 @@ func RandomNumber(min, max int) int {
 func RandomCurrency() string {
 	currencies := []string{"USD", "VND", "CAD"}
 	return currencies[RandomNumber(0, len(currencies)-1)]
+}
+
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(5))
 }

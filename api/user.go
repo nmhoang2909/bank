@@ -28,12 +28,14 @@ func (s *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	id, err := s.store.CreateUser(ctx, db.CreateUserParams{
+	params := db.CreateUserParams{
 		Username:     req.Username,
 		FullName:     req.FullName,
 		Email:        req.Email,
 		HashPassword: hashedPw,
-	})
+	}
+
+	id, err := s.store.CreateUser(ctx, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

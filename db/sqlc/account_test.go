@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreateAccount(t *testing.T) {
-	username := createRandomUser(t)
+	username, _ := randomCreateUser(t)
 	arg := CreateAccountParams{
 		Owner:    username,
 		Balance:  200,
@@ -21,7 +21,7 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func createRandomAccount(t *testing.T) (accountId int64) {
-	username := createRandomUser(t)
+	username, _ := randomCreateUser(t)
 	arg := CreateAccountParams{
 		Owner:    username,
 		Balance:  int32(util.RandomNumber(500, 10000)),
