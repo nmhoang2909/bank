@@ -2,4 +2,4 @@
 insert into users (username, full_name, email, hash_password) values (?, ?, ?, ?);
 
 -- name: GetUser :one
-select * from users where username = ?aaaaaaaa;
+select * from users where username = ?;

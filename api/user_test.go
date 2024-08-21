@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,19 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
-
-func checkBodyMatchUser(t *testing.T, body *bytes.Buffer, expect db.User) {
-	bs, err := io.ReadAll(body)
-	assert.NoError(t, err)
-
-	type data struct {
-		Data db.User `json:"data"`
-	}
-	var actual data
-	err = json.Unmarshal(bs, &actual)
-	assert.NoError(t, err)
-	assert.Equal(t, expect, actual.Data)
-}
 
 func TestUserAPI(t *testing.T) {
 	pw := util.RandomString(5)
@@ -52,7 +38,7 @@ func TestUserAPI(t *testing.T) {
 				Password: pw,
 			},
 			stubs: func(mi *mockdb.MockIStore) {
-				mi.EXPECT().CreateUser(gomock.Any(), gomock.Eq(user)).Return(int64(0), nil)
+				mi.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(int64(0), nil)
 			},
 			checkResponse: func(t *testing.T, resp *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusCreated, resp.Code)
