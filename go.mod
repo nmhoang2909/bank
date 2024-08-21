@@ -2,7 +2,11 @@ module github.com/nmhoang2909/bank
 
 go 1.22.5
 
-require github.com/go-sql-driver/mysql v1.8.1
+require (
+	github.com/go-sql-driver/mysql v1.8.1
+	github.com/google/uuid v1.6.0
+	golang.org/x/crypto v0.23.0
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
@@ -40,7 +44,6 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
@@ -53,6 +56,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/gin-gonic/gin v1.10.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/mock v0.4.0
