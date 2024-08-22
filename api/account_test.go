@@ -98,7 +98,8 @@ func TestGetAccountAPI(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockdb.NewMockIStore(ctrl)
-			server := NewServer(store)
+			server, err := NewServer(store)
+			assert.NoError(t, err)
 			tc.buildStubs(store)
 
 			request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/accounts/%d", tc.accountId), nil)
