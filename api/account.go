@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	db "github.com/nmhoang2909/bank/db/sqlc"
+	"github.com/nmhoang2909/bank/token"
 )
 
 type CreateAccountParams struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,oneof=USD EUR"`
 }
 
@@ -21,8 +21,10 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
 	id, err := s.store.CreateAccount(ctx, db.CreateAccountParams{
-		Owner:    createAccount.Owner,
+		Owner:    payload.Issuer,
 		Balance:  0,
 		Currency: createAccount.Currency,
 	})

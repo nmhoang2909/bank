@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	mockdb "github.com/nmhoang2909/bank/db/mock"
 	db "github.com/nmhoang2909/bank/db/sqlc"
@@ -98,11 +99,13 @@ func TestGetAccountAPI(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockdb.NewMockIStore(ctrl)
-			server, err := NewServer(store)
-			assert.NoError(t, err)
+			server := newTestServer(t, store)
 			tc.buildStubs(store)
 
 			request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/accounts/%d", tc.accountId), nil)
+			token, err := server.tokenMaker.CreateToken(account.Owner, time.Minute)
+			assert.NoError(t, err)
+			request.Header.Set(authorizationHeaderKey, authorizationTypeBearer+" "+token)
 			assert.NoError(t, err)
 			recorder := httptest.NewRecorder()
 			server.route.ServeHTTP(recorder, request)

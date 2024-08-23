@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	db "github.com/nmhoang2909/bank/db/sqlc"
 	"github.com/nmhoang2909/bank/token"
+	"github.com/nmhoang2909/bank/util"
 )
 
 type Server struct {
@@ -13,10 +14,11 @@ type Server struct {
 	route         *gin.Engine
 	tokenMaker    token.Maker
 	tokenDuration time.Duration
+	config        util.Config
 }
 
-func NewServer(store db.IStore) (*Server, error) {
-	maker, err := token.NewPasetoMaker("12345678901234567890123456789012")
+func NewServer(store db.IStore, config util.Config) (*Server, error) {
+	maker, err := token.NewPasetoMaker(config.SymmetricKey)
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +28,7 @@ func NewServer(store db.IStore) (*Server, error) {
 		store:         store,
 		tokenMaker:    maker,
 		tokenDuration: tokenDuration,
+		config:        config,
 	}
 
 	sv.setRoutes()
@@ -39,14 +42,16 @@ func (s *Server) Start(address string) error {
 
 func (s *Server) setRoutes() {
 	router := gin.Default()
-	router.POST("/accounts", s.createAccount)
-	router.GET("/accounts/:id", s.getAccount)
-	router.GET("/accounts", s.getAccounts)
-	router.PUT("/accounts", s.updateBalanceAccount)
-	router.DELETE("/accounts/:id", s.deleteAccount)
-
 	router.POST("/users/login", s.userLogin)
 	router.POST("/users", s.createUser)
+
+	authRoutes := router.Group("/").Use(authMiddleware(s.tokenMaker))
+
+	authRoutes.POST("/accounts", s.createAccount)
+	authRoutes.GET("/accounts/:id", s.getAccount)
+	authRoutes.GET("/accounts", s.getAccounts)
+	authRoutes.PUT("/accounts", s.updateBalanceAccount)
+	authRoutes.DELETE("/accounts/:id", s.deleteAccount)
 
 	s.route = router
 }

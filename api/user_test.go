@@ -52,8 +52,7 @@ func TestUserAPI(t *testing.T) {
 			defer ctrl.Finish()
 
 			db := mockdb.NewMockIStore(ctrl)
-			sv, err := NewServer(db)
-			assert.NoError(t, err)
+			sv := newTestServer(t, db)
 			test.stubs(db)
 
 			body, _ := json.Marshal(test.req)

@@ -45,6 +45,9 @@ func (p *PasetoMaker) VerifyToken(token string) (*Payload, error) {
 	if err := p.paseto.Decrypt(token, p.symmetricKey, payload, nil); err != nil {
 		return nil, err
 	}
+	if payload.IssuedAt.After(payload.ExpiresAt.Time) {
+		return nil, fmt.Errorf("token is expired")
+	}
 
 	return payload, nil
 }
