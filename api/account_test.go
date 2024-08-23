@@ -106,7 +106,6 @@ func TestGetAccountAPI(t *testing.T) {
 			token, err := server.tokenMaker.CreateToken(account.Owner, time.Minute)
 			assert.NoError(t, err)
 			request.Header.Set(authorizationHeaderKey, authorizationTypeBearer+" "+token)
-			assert.NoError(t, err)
 			recorder := httptest.NewRecorder()
 			server.route.ServeHTTP(recorder, request)
 

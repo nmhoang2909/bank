@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -64,6 +65,11 @@ func (s *Server) getAccount(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if payload.Issuer != account.Owner {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(fmt.Errorf("account doesn't belong to authenticated user")))
 		return
 	}
 
