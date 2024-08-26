@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=root:secret@db:33060/bank?parseTime=true
+    depends_on:
+      db:
+        condition: service_started
+        restart: true
+      # - db
+      # condition: service_healthy
+      # restart: true
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: bank
+      MYSQL_ROOT_PASSWORD: secret
+    healthcheck:
+      test: ["CMD", "mysql -u root -p secret -e 'SELECT 1;'"]
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD",
+    #       "CMD-SHELL",
+    #       "sh",
+    #       "-c",
+    #       "mysql -u root -p secret -e 'SELECT 1;'",
+    #     ]
+    #   interval: 1m
+    #   timeout: 10s
+    #   retries: 3
